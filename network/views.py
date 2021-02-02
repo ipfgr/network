@@ -11,6 +11,27 @@ def index(request):
     return render(request, "network/index.html")
 
 
+def getAllPosts():
+    pass
+
+def posts_view():
+    pass
+
+def profile_view(request, user):
+    currentuser = request.user.username
+    finduser = User.objects.filter(username = user)
+    if finduser:
+        if currentuser == user:
+            return render(request, "network/profile.html", {
+                "currentuser": user
+            })
+        else:
+            return render(request, "network/profile.html", {
+                "currentuser":user
+            })
+    else:
+        return render(request, "network/index.html")
+
 def login_view(request):
     if request.method == "POST":
 
