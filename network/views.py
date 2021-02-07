@@ -1,17 +1,16 @@
 import json
+
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
 from django.db import IntegrityError
 from django.http import HttpResponseRedirect, JsonResponse
 from django.shortcuts import render
 from django.urls import reverse
-from django.contrib.auth.decorators import login_required
-from django.core.paginator import Paginator
 
-
+from .models import Follow
+from .models import Like
 from .models import Post
 from .models import User
-from .models import Like
-from .models import Follow
 
 
 def index(request):
@@ -19,9 +18,11 @@ def index(request):
     }
     return render(request, "network/index.html", context)
 
+
 @login_required()
 def follow_view():
     pass
+
 
 @login_required()
 def like_view(request):
@@ -29,26 +30,30 @@ def like_view(request):
         data = json.loads(request.body)
         user = data.get("user", "")
         title = data.get("title", "")
+        user_names = User.objects.raw("SELECT * FROM network_user WHERE username=%s", [user])
         like = Post.objects.get(title=title)
-        wholike = Like.objects.raw("SELECT * FROM network_like WHERE like_by=%s AND like_topost_id=%s", [user, title])
-        if not wholike:
-            like.likes += 1
-            like.save()
-            wl = Like(like_topost_id=title, like_by=user)
-            wl.save()
-            return JsonResponse({
-                "Ok": "Like put successful"
-            }, status=201)
+        if user_names is not None:
+            wholike = Like.objects.raw("SELECT * FROM network_like WHERE like_by=%s AND like_topost_id=%s",
+                                       [user, title])
+            if not wholike:
+                like.likes += 1
+                like.save()
+                wl = Like(like_topost_id=title, like_by=user)
+                wl.save()
+                return JsonResponse({
+                    "Ok": "Like put successful"
+                }, status=201)
 
 
+            else:
+                like.likes -= 1
+                like.save()
+                Like.objects.get(like_topost_id=title, like_by=user).delete()
+                return JsonResponse({
+                    "Ok": "Unlike put successful"
+                }, status=201)
         else:
-            like.likes -= 1
-            like.save()
-            Like.objects.get(like_topost_id=title, like_by=user).delete()
-            return JsonResponse({
-                "Ok": "Unlike put successful"
-            }, status=201)
-
+            return JsonResponse({"Invalid username "})
 
 
 def getAllPosts():
@@ -68,9 +73,8 @@ def posts_view(request):
         page = request.GET.get("page")
         start = len(Post.objects.all()) - (int(page) * 4)
         end = len(Post.objects.all())
-        posts = Post.objects.raw('SELECT * FROM network_post WHERE id BETWEEN %s AND %s', [start, end+1])
+        posts = Post.objects.raw('SELECT * FROM network_post WHERE id BETWEEN %s AND %s', [start, end + 1])
         return JsonResponse([post.serialize() for post in posts], safe=False)
-
 
 
 def singlepost_view(request, post_id):
