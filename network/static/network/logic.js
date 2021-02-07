@@ -1,8 +1,20 @@
 document.addEventListener("DOMContentLoaded", () => {
 
-
     document.getElementById("submit-post").addEventListener("click", () => submitPost())
     document.getElementById("followiing-page").addEventListener("click", () => showAllPosts())
+
+
+        $('#edit-modal').on('show.bs.modal', function(e) {
+            var button = $(e.relatedTarget)
+            let modal_title = button.data('bs-filltitle')
+            let modal_body = button.data('bs-fillbody')
+            var $modal = $(this)
+
+                    $modal.find('.modal-title').text(modal_title);
+                    $modal.find('.modal-body textarea').val(modal_body);
+
+        })
+
 
 
     document.getElementById("follow").style.display = 'none';
@@ -13,8 +25,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const indexpagebutton = document.querySelector("#indexpage")
     indexpagebutton.addEventListener("click", () => showAllPosts())
 
-
 })
+
 
 function setLike(title, user) {
     fetch(`posts/like`, {
@@ -69,6 +81,14 @@ function getCookie(name) {
     return cookieValue;
 }
 
+function postEdit() {
+
+    //Функция отображения PopUp
+
+
+
+}
+
 function showAllPosts() {
     let pagination = document.querySelector("#pagination")
     const full_posts = document.querySelector("#full-posts")
@@ -81,7 +101,24 @@ function showAllPosts() {
         .then(result => {
             if (result.length > 0) {
                 for (let i = result.length - 1; i >= 0; i--) {
-                    let row = `
+                    if (result[i].publish_user == username){
+                        let row = `
+                                    <div class="one-post">
+                                    <div class="out-post-container">
+                                    <div class="post-title">${result[i].title}</div>
+                                    <div class="post-timestamp">${result[i].timestamp}</div>
+                                    <div class="post-body">${result[i].body}</div>
+                                    <div class="post-publish_user"><a href="/profile/${result[i].publish_user}">Posted by: ${result[i].publish_user}</a></div>
+                                    <div class="likes"><button id="submit-like" onClick = "setLike('${result[i].title}' , '${username}')" class="btn btn-danger like-button" >${result[i].likes}</button> like's</div>
+                                                                        <!-- Button trigger modal -->
+                                    <div class="post-edit"><button id="edit-post" data-bs-toggle="modal" data-bs-target="#edit-modal" data-bs-filltitle="${result[i].title}" data-bs-fillbody="${result[i].title}" class="btn btn-outline-info edit-button" >Edit this post</button></div>
+                                    </div>
+                                    </div>
+                                    `
+                    full_posts.innerHTML += row
+                    }
+                    else{
+                        let row = `
                                     <div class="one-post">
                                     <div class="out-post-container">
                                     <div class="post-title">${result[i].title}</div>
@@ -93,6 +130,8 @@ function showAllPosts() {
                                     </div>
                                     `
                     full_posts.innerHTML += row
+                    }
+
 
                 }
             } else {
@@ -102,6 +141,8 @@ function showAllPosts() {
                 full_posts.innerHTML = row;
             }
         }).catch(error => console.error(error))
+
+
 }
 
 function showAllUserPosts(username) {

@@ -151,6 +151,16 @@
     border-radius: 5px;
 }
 
+.post-edit{
+    justify-content: right;
+    display:flex;
+
+}
+.edit-button{
+    margin-top: 5px;
+
+}
+
 
 
 .one-post{
@@ -175,3 +185,6 @@
 .load-more:hover{
   opacity:1;
 }
+
+
+
