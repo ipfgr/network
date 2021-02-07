@@ -15,32 +15,26 @@
                             <div class="row about-list">
                                 <div class="col-md-6">
                                     <div class="media">
-                                        <label>Birthday</label>
-                                        <p>4th april 1998</p>
+                                        <label>Followers</label>
+                                        <p>Followed by {{ userfollowers }} people</p>
                                     </div>
-                                    <div class="media">
-                                        <label>Age</label>
-                                        <p>22 Yr</p>
-                                    </div>
-                                    
 
                                 </div>
                                 <div class="col-md-6">
                                     <div class="media">
-                                        <label>E-mail</label>
-                                        <p>info@domain.com</p>
-                                    </div>
-                                    <div class="media">
-                                        <label>Phone</label>
-                                        <p>820-885-3321</p>
+                                        <label>Follow</label>
+                                        <p>This user follow  {{ userfollow }} people</p>
                                     </div>
 
                                 </div>
                             </div>
+                            {% if not buttons %}
+
                             <div class="profile-buttons">
-                                <button class="btn btn-outline-primary">Follow</button>
-                                <button class="btn btn-outline-info">Unfollow</button>
+                                <button id="follow" class="btn btn-outline-primary">Follow</button>
+                                <button id="unfollow" class="btn btn-outline-info">Unfollow</button>
                             </div>
+                            {% endif %}
                             <br>
                         </div>
                     </div>
@@ -53,15 +47,28 @@
 
                 </div>
             </div>
-        </section>
 
-{#    <div class="profile-header">#}
-{#            <h2>Profile for user {{ currentuser }}</h2>#}
-{#    </div>#}
-{##}
-{#    <div class="profile-buttons">#}
-{#        <button class="btn btn-outline-primary">Follow</button>#}
-{#        <button class="btn btn-outline-info">Unfollow</button>#}
-{#    </div>#}
-    </div>
+        </section>
+</div>
+    <div class="posts-for-profile">
+            <div class="container">
+
+                 <div class="row align-items-center flex-row-reverse">
+                            <h1>All post's from user {{ currentuser }}</h1>
+                            <nav aria-label="Page navigation example">
+                              <ul id="pagination" class="pagination">
+                                {#pagination insert here#}
+                              </ul>
+                            </nav>
+                            <div id="user-posts" class="posts">
+                                {#Posts insert here#}
+                            </div>
+                        </div>
+    <button type="button" id="load-more" onclick='showAllUserPosts("{{ currentuser }}")' class="btn btn-outline-info load-more" >Load more</button>
+
+            </div>
+        </div>
+
+
+
 {% endblock %}
