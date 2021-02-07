@@ -2,6 +2,8 @@
 {% load static %}
 
 {% block body %}
+        {{ request.user.username|json_script:"username" }}
+
 <div >
 
 
@@ -41,8 +43,11 @@ Left
 {#                                                    pagination insert here#}
                                                   </ul>
                                                 </nav>
-                                                <div id="all-posts" class="posts">
+                                                <div id="full-posts" class="posts">
                                                     {#Posts insert here#}
+                                                </div>
+                                                <div id="followed-posts" class="posts">
+                                                    {#Followed insert here#}
                                                 </div>
                                             </div>
 

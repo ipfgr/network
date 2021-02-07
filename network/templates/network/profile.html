@@ -2,6 +2,7 @@
 {% load static %}
 
 {% block body %}
+    {{ request.user.id|json_script:"user_id" }}
     <br/>
     <div class="profile-container">
     <section class="section about-section gray-bg" id="about">

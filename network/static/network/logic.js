@@ -2,35 +2,36 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
     document.getElementById("submit-post").addEventListener("click", () => submitPost())
+    document.getElementById("followiing-page").addEventListener("click", () => showAllPosts())
 
 
-
-    document.getElementById("#follow").style.display = 'none';
+    document.getElementById("follow").style.display = 'none';
     document.querySelector("#unfollow").style.display = 'none';
+    document.querySelector("#full-posts").style.display = 'none';
+    document.querySelector("#followed-posts").style.display = 'none';
 
     const indexpagebutton = document.querySelector("#indexpage")
     indexpagebutton.addEventListener("click", () => showAllPosts())
 
 
-    
 })
 
-function setLike(title,user){
-    fetch(`posts/like`,{
+function setLike(title, user) {
+    fetch(`posts/like`, {
         method: "POST",
-        headers:{
-            "X-CSRFToken":getCookie("csrftoken")
+        headers: {
+            "X-CSRFToken": getCookie("csrftoken")
         },
         body: JSON.stringify({
             user: user,
             title: title,
 
         })
-    })  .then(response =>response.json())
+    }).then(response => response.json())
         .then(result => console.log(result))
         .catch(error => console.log(error))
 
-        location.reload()
+    location.reload()
 }
 
 function submitPost() {
@@ -39,8 +40,8 @@ function submitPost() {
     fetch('/posts', {
         method: "POST",
         headers: {
-                "X-CSRFToken": getCookie("csrftoken")
-            },
+            "X-CSRFToken": getCookie("csrftoken")
+        },
         body: JSON.stringify({
             title: title,
             body: body,
@@ -70,37 +71,37 @@ function getCookie(name) {
 
 function showAllPosts() {
     let pagination = document.querySelector("#pagination")
-    let allposts = document.querySelector("#all-posts")
+    const full_posts = document.querySelector("#full-posts")
+    const username = JSON.parse(document.getElementById('username').textContent);
+    console.log(username)
 
 
     fetch(`/posts?page=1`)
         .then(response => response.json())
         .then(result => {
             if (result.length > 0) {
-                for (let i = result.length-1; i >= 0; i--) {
-                    row = `
+                for (let i = result.length - 1; i >= 0; i--) {
+                    let row = `
                                     <div class="one-post">
                                     <div class="out-post-container">
                                     <div class="post-title">${result[i].title}</div>
                                     <div class="post-timestamp">${result[i].timestamp}</div>
                                     <div class="post-body">${result[i].body}</div>
                                     <div class="post-publish_user"><a href="/profile/${result[i].publish_user}">Posted by: ${result[i].publish_user}</a></div>
-                                    <div class="likes"><button id="submit-like" onClick = "setLike('${result[i].title}' , '${result[i].publish_user}')" class="btn btn-danger like-button" >${result[i].likes}</button> like's</div>
+                                    <div class="likes"><button id="submit-like" onClick = "setLike('${result[i].title}' , '${username}')" class="btn btn-danger like-button" >${result[i].likes}</button> like's</div>
                                     </div>
                                     </div>
                                     `
-                    allposts.innerHTML += row
+                    full_posts.innerHTML += row
 
                 }
             } else {
-                row = `
-                                       <h5>This user not yet have posts</h5>
+                let row = `
+                                       <h5>Not yet have posts</h5>
                                       `
-                allposts.innerHTML = row;
+                full_posts.innerHTML = row;
             }
-
         }).catch(error => console.error(error))
-
 }
 
 function showAllUserPosts(username) {
@@ -138,7 +139,7 @@ function showAllUserPosts(username) {
                 userposts.innerHTML = row;
             }
 
-    }).catch(error => console.error(error))
+        }).catch(error => console.error(error))
 
 
 }

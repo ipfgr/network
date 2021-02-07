@@ -54,7 +54,7 @@ def like_view(request):
 def getAllPosts():
     pass
 
-@login_required
+
 def posts_view(request):
     if request.method == "POST":
         data = json.loads(request.body)
@@ -70,7 +70,6 @@ def posts_view(request):
         end = len(Post.objects.all())
         posts = Post.objects.raw('SELECT * FROM network_post WHERE id BETWEEN %s AND %s', [start, end+1])
         return JsonResponse([post.serialize() for post in posts], safe=False)
-
 
 
 
