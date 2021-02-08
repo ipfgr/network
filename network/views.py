@@ -55,7 +55,19 @@ def like_view(request):
         else:
             return JsonResponse({"Invalid username "})
 
+@login_required()
+def posts_saveedit(request):
+    if request.method == "POST":
+        data = json.loads(request.body)
+        body = data.get("body", "")
+        title = data.get("title", "")
+        Post.objects.filter(title=title).update(post_body=body)
+        return JsonResponse({"message": "Successfully updated."}, status=201)
 
+
+    
+    
+    
 def getAllPosts():
     pass
 
