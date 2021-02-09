@@ -2,6 +2,7 @@ import json
 
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
+from django.core.paginator import Paginator
 from django.db import IntegrityError
 from django.http import HttpResponseRedirect, JsonResponse
 from django.shortcuts import render
@@ -14,7 +15,10 @@ from .models import User
 
 
 def index(request):
+    for_pagination = Post.objects.all().order_by("-id")
+    posts = Paginator(for_pagination, 3)
     context = {
+        "pagination": posts
     }
     return render(request, "network/index.html", context)
 
@@ -72,7 +76,7 @@ def getAllPosts():
     pass
 
 
-def posts_view(request):
+def posts_view(request, page=""):
     if request.method == "POST":
         data = json.loads(request.body)
         body = data.get("body", "")
@@ -82,11 +86,13 @@ def posts_view(request):
         return JsonResponse({"message": "Successfully posted."}, status=201)
 
     if request.method != "POST":
+        for_pagination = Post.objects.all().order_by("-id")
         page = request.GET.get("page")
-        start = len(Post.objects.all()) - (int(page) * 4)
-        end = len(Post.objects.all())
-        posts = Post.objects.raw('SELECT * FROM network_post WHERE id BETWEEN %s AND %s', [start, end + 1])
-        return JsonResponse([post.serialize() for post in posts], safe=False)
+        posts = Paginator(for_pagination, 3)
+        page_obj = posts.get_page(page)
+        print(page)
+        return JsonResponse([post.serialize() for post in page_obj], safe=False , )
+
 
 
 def singlepost_view(request, post_id):
@@ -107,13 +113,19 @@ def profile_view(request, user):
     userfollowers = Follow.objects.filter(user_tofollow=user).count()
     userfollow = Follow.objects.filter(user_whofollow=user).count()
 
+    for_pagination = Post.objects.all().order_by("-id")
+    posts = Paginator(for_pagination, 3)
+
+
     if finduser:
         if currentuser == user:
             return render(request, "network/profile.html", {
                 "currentuser": user.capitalize(),
                 "userfollow": userfollow,
                 "userfollowers": userfollowers,
-                "buttons": False
+                "buttons": False,
+                "pagination": posts
+
             })
         else:
             return render(request, "network/profile.html", {
@@ -121,7 +133,8 @@ def profile_view(request, user):
                 "currentuser": user.capitalize(),
                 "userfollow": userfollow,
                 "userfollowers": userfollowers,
-                "buttons": True
+                "buttons": True,
+                "pagination": posts
 
             })
     else:

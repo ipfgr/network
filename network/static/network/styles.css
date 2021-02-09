@@ -1,12 +1,20 @@
 * {
     margin: 0;
     padding:0;
+    font-family:sans-serif;
 }
 
 .newpost{
-    background-color:gainsboro;
+    -webkit-box-shadow: 0px 0px 2px 1px rgba(0,0,0,0.2);
+    -moz-box-shadow: 0px 0px 2px 1px rgba(0,0,0,0.2);
+    box-shadow: 0px 0px 2px 1px rgba(0,0,0,0.2);
 }
 
+.new-post-h1{
+   margin-left: 20px;
+    paddiing-top: 20px;
+
+}
 
 .newpost-main{
     margin: 10px;
@@ -58,12 +66,17 @@
 }
 
 .sidebar-left{
-    position:relative;
-    background-color: aqua;
+        -webkit-box-shadow: 0px 0px 2px 1px rgba(0,0,0,0.2);
+    -moz-box-shadow: 0px 0px 2px 1px rgba(0,0,0,0.2);
+    box-shadow: 0px 0px 2px 1px rgba(0,0,0,0.2);
+
 }
 
 .sidebar-right{
-    background-color:fuchsia;
+        -webkit-box-shadow: 0px 0px 2px 1px rgba(0,0,0,0.2);
+    -moz-box-shadow: 0px 0px 2px 1px rgba(0,0,0,0.2);
+    box-shadow: 0px 0px 2px 1px rgba(0,0,0,0.2);
+
 }
 
 /*CSS For Profile page*/
@@ -72,7 +85,7 @@
     display: flex;
     justify-content: center;
     text-align: center;
-    border:1px dashed black;
+    border:1px solid black;
     -webkit-box-shadow: 0px 0px 2px 1px rgba(0,0,0,0.2);
     -moz-box-shadow: 0px 0px 2px 1px rgba(0,0,0,0.2);
     box-shadow: 0px 0px 2px 1px rgba(0,0,0,0.2);
@@ -87,7 +100,7 @@
 }
 
 .posts-for-profile {
-    border:1px dashed black;
+
     -webkit-box-shadow: 0px 0px 2px 1px rgba(0,0,0,0.2);
     -moz-box-shadow: 0px 0px 2px 1px rgba(0,0,0,0.2);
     box-shadow: 0px 0px 2px 1px rgba(0,0,0,0.2);
@@ -112,6 +125,30 @@
     border: 1px solid deepskyblue;
     padding: 5px;
     margin-bottom: 10px;
+    -webkit-transition: .5s ease-in-out;
+  -moz-transition: .5s ease-in-out;
+  -o-transition: .5s ease-in-out;
+  transition: .5s ease-in-out;
+
+}
+
+.post-edit{
+    visibility: hidden;
+  opacity: 0;
+  transition: visibility 0s, opacity 0.5s linear;
+
+
+}
+
+.out-post-container:hover{
+     border: 2px solid #068f9e;
+
+}
+.out-post-container:hover .post-edit{
+        visibility: visible;
+  opacity: 1;
+
+
 }
 
 .post-title{

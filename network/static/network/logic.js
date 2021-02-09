@@ -6,6 +6,23 @@ document.addEventListener("DOMContentLoaded", () => {
     submitNewPost.addEventListener("click", () => submitPost())
     indexPageButton.addEventListener("click", () => showAllPosts())
 
+    const page = document.querySelectorAll("#page")
+    const pageProfile = document.querySelectorAll("#page-profile")
+
+
+    page.forEach(el => {
+        let number = el.innerHTML
+        el.addEventListener('click', () => showAllPosts(number))
+        console.log(number)
+    })
+
+    pageProfile.forEach(el => {
+        let number = el.innerHTML
+        el.addEventListener('click', () => showAllUserPosts(number))
+        console.log(number)
+    })
+
+
         $('#edit-modal').on('show.bs.modal', function(e) {
             const button = $(e.relatedTarget)
             let modal_title = button.data('bs-filltitle')
@@ -30,7 +47,7 @@ document.addEventListener("DOMContentLoaded", () => {
 })
 
 
-function setLike(title, user) {
+function setLike(title, user, page) {
     const full_posts = document.querySelector("#full-posts")
     fetch(`posts/like`, {
         method: "POST",
@@ -47,7 +64,7 @@ function setLike(title, user) {
         .finally(() => {
 
             full_posts.innerHTML = ""
-            showAllPosts()
+            showAllPosts(this.page)
         })
 }
 
@@ -106,7 +123,9 @@ function getCookie(name) {
     return cookieValue;
 }
 
-function postEdit() {
+function addpPagination() {
+    const pagination = document.querySelector("#pag-page")
+
 
     //Функция отображения PopUp
 
@@ -114,16 +133,16 @@ function postEdit() {
 
 }
 
-function showAllPosts() {
-    const pagination = document.querySelector("#pagination")
+function showAllPosts(number=1) {
     const full_posts = document.querySelector("#full-posts")
     const username = JSON.parse(document.getElementById('username').textContent)
+    full_posts.innerHTML = ""
 
-    fetch(`/posts?page=1`)
+    fetch(`/posts?page=${number}`)
         .then(response => response.json())
         .then(result => {
             if (result.length > 0) {
-                for (let i = result.length - 1; i >= 0; i--) {
+                for (let i = 0; i < result.length; i++) {
                     if (result[i].publish_user == username){
                         let row = `
                                     <div class="one-post">
@@ -167,11 +186,12 @@ function showAllPosts() {
 function showAllUserPosts(username) {
     const loadmore = document.querySelector("#load-more")
     const userPosts = document.querySelector("#user-posts")
+    const title = document.querySelector("#title-h1")
     let pagination = document.querySelector("#pagination")
     let pagination_start = 0
     let pagination_end = 1
     loadmore.style.display = 'block';
-
+    title.insertAdjacentHTML("beforeend", `All post's from user ${username}`)
     fetch(`/posts/${username.toLowerCase()}`)
         .then(response => response.json())
         .then(result => {
