@@ -7,6 +7,7 @@ from django.db import IntegrityError
 from django.http import HttpResponseRedirect, JsonResponse
 from django.shortcuts import render
 from django.urls import reverse
+from django.db.models import Q
 
 from .models import Follow
 from .models import Like
@@ -24,8 +25,31 @@ def index(request):
 
 
 @login_required()
-def follow_view():
-    pass
+def follow_user_view(request):
+    if request.method == "GET":
+        page = request.GET.get("page")
+        follow_users = Follow.objects.filter(user_whofollow_id=request.user.username)
+        query = Q()
+        for username in follow_users:
+            query.add(Q(publish_user_id=username.user_tofollow_id), Q.OR)
+        for_pagination = Post.objects.filter(query)
+        posts = Paginator(for_pagination, 3)
+        page_obj = posts.get_page(page)
+
+        return JsonResponse([post.serialize() for post in page_obj], safe=False)
+
+    if request.method == "POST":
+        data = json.loads(request.body)
+        who_follow = data.get("user", "")
+        whom_follow = data.get("followto", "")
+        follow_check = Follow.objects.filter(user_whofollow_id=who_follow, user_tofollow_id=whom_follow)
+        if not follow_check:
+            follow_request = Follow(user_whofollow_id=who_follow, user_tofollow_id=whom_follow)
+            follow_request.save()
+            return JsonResponse({"Ok": "start following"}, status=200)
+        else:
+            follow_check.delete()
+            return JsonResponse({"Ok": "Unfollow"}, status=201)
 
 
 @login_required()
@@ -47,8 +71,6 @@ def like_view(request):
                 return JsonResponse({
                     "Ok": "Like put successful"
                 }, status=201)
-
-
             else:
                 like.likes -= 1
                 like.save()
@@ -59,6 +81,7 @@ def like_view(request):
         else:
             return JsonResponse({"Invalid username "})
 
+
 @login_required()
 def posts_saveedit(request):
     if request.method == "POST":
@@ -67,13 +90,6 @@ def posts_saveedit(request):
         title = data.get("title", "")
         Post.objects.filter(title=title).update(post_body=body)
         return JsonResponse({"message": "Successfully updated."}, status=201)
-
-
-    
-    
-    
-def getAllPosts():
-    pass
 
 
 def posts_view(request, page=""):
@@ -87,38 +103,30 @@ def posts_view(request, page=""):
 
     if request.method != "POST":
         for_pagination = Post.objects.all().order_by("-id")
+        print(for_pagination)
         page = request.GET.get("page")
         posts = Paginator(for_pagination, 3)
         page_obj = posts.get_page(page)
-        print(page)
-        return JsonResponse([post.serialize() for post in page_obj], safe=False , )
-
-
-
-def singlepost_view(request, post_id):
-    pass
+        return JsonResponse([post.serialize() for post in page_obj], safe=False)
 
 
 def user_post_view(request, user):
-    posts = Post.objects.raw("SELECT * FROM network_post WHERE publish_user_id=%s", [user])
+    posts = Post.objects.raw("SELECT * FROM network_post WHERE publish_user_id=%s ORDER BY id DESC", [user])
     return JsonResponse([post.serialize() for post in posts], safe=False)
 
 
 def profile_view(request, user):
     currentuser = request.user.username
     finduser = User.objects.filter(username=user)
-    # userfollowers = Follow.objects.raw("SELECT * FROM network_follow WHERE user_tofollow=%s", [user])
-    # userfollow = Follow.objects.raw("SELECT COUNT * FROM network_follow WHERE user_whofollow=%s", [user])
-
-
     userfollowers = Follow.objects.filter(user_tofollow=user).count()
     userfollow = Follow.objects.filter(user_whofollow=user).count()
-
     for_pagination = Post.objects.all().order_by("-id")
     posts = Paginator(for_pagination, 3)
-
     followcheck = Follow.objects.filter(user_whofollow=currentuser, user_tofollow=user)
-    print(followcheck)
+    if not followcheck:
+        checker = 1
+    else:
+        checker = 2
 
     if finduser:
         if currentuser == user:
@@ -126,38 +134,19 @@ def profile_view(request, user):
                 "currentuser": user.capitalize(),
                 "userfollow": userfollow,
                 "userfollowers": userfollowers,
-                "buttons": True,
+                "buttons": checker,
                 "pagination": posts
-
             })
         else:
             return render(request, "network/profile.html", {
                 "currentuser": user.capitalize(),
                 "userfollow": userfollow,
                 "userfollowers": userfollowers,
-                "buttons": False,
+                "buttons": checker,
                 "pagination": posts
-
             })
     else:
         return render(request, "network/index.html")
-
-@login_required()
-def follow_user_view(request):
-    if request.method == "POST":
-        data = json.loads(request.body)
-        who_follow = data.get("user", "")
-        whom_follow = data.get("followto", "")
-        print(who_follow, whom_follow)
-
-        follow_check = Follow.objects.filter(user_whofollow_id=who_follow, user_tofollow_id=whom_follow)
-        if not follow_check:
-            follow_request = Follow(user_whofollow_id=who_follow, user_tofollow_id=whom_follow)
-            follow_request.save()
-            return JsonResponse({"Ok": "start following"}, status=200)
-        else:
-            follow_check.delete()
-            return JsonResponse({"Ok": "Unfollow"}, status=201)
 
 
 def login_view(request):

@@ -30,12 +30,16 @@
 
                                 </div>
                             </div>
-                            {% if not buttons %}
-                                <button id="follow" class="btn btn-outline-info" href="#">Follow</button>
-                            <div class="profile-buttons">
+                            {% if buttons == 1 %}
 
-                            </div>
+
+                                <button id="follow" class="btn btn-outline-info" href="#">Follow</button>
+                                {% else %}
+                                <button id="follow" class="btn btn-outline-warning" href="#">Unfollow</button>
+
                             {% endif %}
+                            <div class="profile-buttons">
+                            </div>
                             <br>
                         </div>
                     </div>
@@ -65,7 +69,7 @@
                                 {#Posts insert here#}
                             </div>
                         </div>
-    <button type="button" id="load-more" onclick='showAllUserPosts("{{ currentuser }}")' class="btn btn-outline-info load-more" >Load more</button>
+    <button type="button" id="load-more" onclick='showAllUserPosts("{{ currentuser }}")' class="btn btn-outline-info load-more " >Load more</button>
 
             </div>
         </div>
