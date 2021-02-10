@@ -2,7 +2,8 @@
 {% load static %}
 
 {% block body %}
-    {{ request.user.id|json_script:"user_id" }}
+    {{ request.user.username|json_script:"currentuser" }}
+    {{ currentuser |json_script:"profile_id" }}
     <br/>
     <div class="profile-container">
     <section class="section about-section gray-bg" id="about">
@@ -30,10 +31,9 @@
                                 </div>
                             </div>
                             {% if not buttons %}
-
+                                <button id="follow" class="btn btn-outline-info" href="#">Follow</button>
                             <div class="profile-buttons">
-                                <button id="follow" class="btn btn-outline-primary">Follow</button>
-                                <button id="unfollow" class="btn btn-outline-info">Unfollow</button>
+
                             </div>
                             {% endif %}
                             <br>

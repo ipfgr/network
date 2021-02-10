@@ -110,15 +110,27 @@ def profile_view(request, user):
     # userfollowers = Follow.objects.raw("SELECT * FROM network_follow WHERE user_tofollow=%s", [user])
     # userfollow = Follow.objects.raw("SELECT COUNT * FROM network_follow WHERE user_whofollow=%s", [user])
 
+
     userfollowers = Follow.objects.filter(user_tofollow=user).count()
     userfollow = Follow.objects.filter(user_whofollow=user).count()
 
     for_pagination = Post.objects.all().order_by("-id")
     posts = Paginator(for_pagination, 3)
 
+    followcheck = Follow.objects.filter(user_whofollow=currentuser, user_tofollow=user)
+    print(followcheck)
 
     if finduser:
         if currentuser == user:
+            return render(request, "network/profile.html", {
+                "currentuser": user.capitalize(),
+                "userfollow": userfollow,
+                "userfollowers": userfollowers,
+                "buttons": True,
+                "pagination": posts
+
+            })
+        else:
             return render(request, "network/profile.html", {
                 "currentuser": user.capitalize(),
                 "userfollow": userfollow,
@@ -127,18 +139,25 @@ def profile_view(request, user):
                 "pagination": posts
 
             })
-        else:
-            return render(request, "network/profile.html", {
-                "currentuser": user.capitalize(),
-                "currentuser": user.capitalize(),
-                "userfollow": userfollow,
-                "userfollowers": userfollowers,
-                "buttons": True,
-                "pagination": posts
-
-            })
     else:
         return render(request, "network/index.html")
+
+@login_required()
+def follow_user_view(request):
+    if request.method == "POST":
+        data = json.loads(request.body)
+        who_follow = data.get("user", "")
+        whom_follow = data.get("followto", "")
+        print(who_follow, whom_follow)
+
+        follow_check = Follow.objects.filter(user_whofollow_id=who_follow, user_tofollow_id=whom_follow)
+        if not follow_check:
+            follow_request = Follow(user_whofollow_id=who_follow, user_tofollow_id=whom_follow)
+            follow_request.save()
+            return JsonResponse({"Ok": "start following"}, status=200)
+        else:
+            follow_check.delete()
+            return JsonResponse({"Ok": "Unfollow"}, status=201)
 
 
 def login_view(request):

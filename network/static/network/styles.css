@@ -4,6 +4,13 @@
     font-family:sans-serif;
 }
 
+.logbox{
+    display: flex;
+    position: absolute;
+    border: 1px solid deepskyblue;
+    padding-left:10px;
+}
+
 .newpost{
     -webkit-box-shadow: 0px 0px 2px 1px rgba(0,0,0,0.2);
     -moz-box-shadow: 0px 0px 2px 1px rgba(0,0,0,0.2);

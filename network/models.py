@@ -42,8 +42,8 @@ class Like(models.Model):
 
 
 class Follow(models.Model):
-    user_whofollow = models.ForeignKey(User, to_field="username", on_delete=models.PROTECT, related_name="follow_by")
-    user_tofollow = models.ForeignKey(User, to_field="username", on_delete=models.PROTECT, related_name="follow_to")
+    user_whofollow = models.ForeignKey(User, to_field="username", on_delete=models.CASCADE, related_name="follow_by" )
+    user_tofollow = models.ForeignKey(User, to_field="username", on_delete=models.CASCADE, related_name="follow_to")
     date_startfollow = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

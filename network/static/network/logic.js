@@ -3,6 +3,9 @@ document.addEventListener("DOMContentLoaded", () => {
     const submitNewPost = document.getElementById("submit-post")
     const followPage = document.getElementById("following-page")
     const indexPageButton = document.querySelector("#indexpage")
+    const followButton = document.querySelector("#follow")
+
+    followButton.addEventListener('click', () => startFollow())
     submitNewPost.addEventListener("click", () => submitPost())
     indexPageButton.addEventListener("click", () => showAllPosts())
 
@@ -12,7 +15,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
     page.forEach(el => {
         let number = el.innerHTML
-        el.addEventListener('click', () => showAllPosts(number))
+        el.addEventListener('click', () => {
+            el.parentNode.classList.add("active")
+            showAllPosts(number)
+        })
         console.log(number)
     })
 
@@ -22,32 +28,50 @@ document.addEventListener("DOMContentLoaded", () => {
         console.log(number)
     })
 
+    $('#edit-modal').on('show.bs.modal', function (e) {
+        const button = $(e.relatedTarget)
+        let modal_title = button.data('bs-filltitle')
+        let modal_body = button.data('bs-fillbody')
+        const $modal = $(this)
+        const saveChangesButton = document.querySelector("#save-changes")
+        saveChangesButton.addEventListener("click", () => submitEditPost())
 
-        $('#edit-modal').on('show.bs.modal', function(e) {
-            const button = $(e.relatedTarget)
-            let modal_title = button.data('bs-filltitle')
-            let modal_body = button.data('bs-fillbody')
-            const $modal = $(this)
-            const saveChangesButton = document.querySelector("#save-changes")
-            saveChangesButton.addEventListener("click", ()=> submitEditPost())
+        $modal.find('.modal-title').text(modal_title);
+        $modal.find('.modal-body textarea').val(modal_body);
+    })
 
+    const unfollowButton = document.querySelector("#unfollow")
 
-                    $modal.find('.modal-title').text(modal_title);
-                    $modal.find('.modal-body textarea').val(modal_body);
+    followButton.style.display = "none"
+    unfollowButton.style.display = "none"
 
-        })
-
-    document.getElementById("follow").style.display = 'none';
-    document.querySelector("#unfollow").style.display = 'none';
     document.querySelector("#full-posts").style.display = 'none';
     document.querySelector("#followed-posts").style.display = 'none';
 
-
-
 })
 
+function startFollow() {
+    const user_id = JSON.parse(document.getElementById('currentuser').textContent)
+    const profile_id = JSON.parse(document.getElementById('profile_id').textContent)
 
-function setLike(title, user, page) {
+    fetch(`/posts/follow`, {
+        method: "POST",
+        headers: {
+            "X-CSRFToken": getCookie("csrftoken")
+        },
+        body: JSON.stringify({
+            user: user_id.toLowerCase(),
+            followto: profile_id.toLowerCase(),
+        })
+    })
+        .then(response => response.json())
+        .then(result => console.log(result))
+        .catch(err => console.log(err))
+}
+
+function setLike(title, user) {
+    const currentPage = JSON.parse(document.getElementById("current-page").textContent);
+    console.log(currentPage)
     const full_posts = document.querySelector("#full-posts")
     fetch(`posts/like`, {
         method: "POST",
@@ -64,21 +88,21 @@ function setLike(title, user, page) {
         .finally(() => {
 
             full_posts.innerHTML = ""
-            showAllPosts(this.page)
+            showAllPosts(currentPage)
         })
 }
 
-function submitEditPost(){
+function submitEditPost() {
     const editedValue = document.querySelector("#message-text").value;
     const title = document.querySelector("#modalLabel").innerText
-    fetch (`/posts/edit`,{
+    fetch(`/posts/edit`, {
         method: "POST",
         headers: {
             "X-CSRFToken": getCookie("csrftoken")
         },
         body: JSON.stringify({
-            body:editedValue,
-            title:title
+            body: editedValue,
+            title: title
         })
     })
     $('#edit-modal').modal('hide')
@@ -130,20 +154,21 @@ function addpPagination() {
     //Функция отображения PopUp
 
 
-
 }
 
-function showAllPosts(number=1) {
+function showAllPosts(number = 1) {
     const full_posts = document.querySelector("#full-posts")
+
     const username = JSON.parse(document.getElementById('username').textContent)
     full_posts.innerHTML = ""
+
 
     fetch(`/posts?page=${number}`)
         .then(response => response.json())
         .then(result => {
             if (result.length > 0) {
                 for (let i = 0; i < result.length; i++) {
-                    if (result[i].publish_user == username){
+                    if (result[i].publish_user == username) {
                         let row = `
                                     <div class="one-post">
                                     <div class="out-post-container">
@@ -157,9 +182,8 @@ function showAllPosts(number=1) {
                                     </div>
                                     </div>
                                     `
-                    full_posts.innerHTML += row
-                    }
-                    else{
+                        full_posts.innerHTML += row
+                    } else {
                         let row = `
                                     <div class="one-post">
                                     <div class="out-post-container">
@@ -171,7 +195,7 @@ function showAllPosts(number=1) {
                                     </div>
                                     </div>
                                     `
-                    full_posts.innerHTML += row
+                        full_posts.innerHTML += row
                     }
                 }
             } else {
@@ -188,6 +212,7 @@ function showAllUserPosts(username) {
     const userPosts = document.querySelector("#user-posts")
     const title = document.querySelector("#title-h1")
     let pagination = document.querySelector("#pagination")
+
     let pagination_start = 0
     let pagination_end = 1
     loadmore.style.display = 'block';
