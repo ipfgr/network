@@ -12,9 +12,41 @@
     </div>
     <div class="row">
         <div class="col-2 sidebar-left">
-            Left
+            <nav class="nav">
+        <a class="navbar-brand" href="#">Network</a>
+        <div>
+            <ul class="navbar-nav mr-auto ">
+                <li class="nav-item">
+                    <a class="nav-link " id="indexpage" href="{% url 'index' %}">All Posts</a>
+                </li>
+                    {% if user.is_authenticated %}
+                    <li class="nav-item">
+                        <a id="following-page" class="nav-link" href="{% url "followpage" %}">Following</a>
+                    </li>
+                    <div class="">
+                        <span class="navbar-text logged">
+                            Logged as: <strong><a
+                                href="/profile/{{ request.user.username }}">{{ request.user.username }} </a> </strong>
+                        </span>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'logout' %}">Log Out</a>
+                        </li>
+                    </div>
+                {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'login' %}">Log In</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'register' %}">Register</a>
+                    </li>
+                {% endif %}
+            </ul>
+        </div>
+    </nav>
         </div>
         <div class="col-8 ">
+
+        {% if page_index %}
             <div class="newpost">
                 <h3 class="new-post-h1">Add new post
                     <h3>
@@ -39,12 +71,17 @@
                         </button>
             </div>
             <br/>
+        {% endif %}
 
             <div id="all-posts" class="all-posts">
                 <div class="posts-for-profile">
                     <div class="container">
                         <div class="row align-items-center flex-row-reverse">
-                            <h1>All post's</h1>
+                            {% if page_index %}
+                                <div class="posts-header"><h1>All post's</h1></div>
+                            {% elif  page_follow%}
+                                <div class="posts-header"><h1> Your folowing posts</h1></div>
+                            {% endif %}
                             <nav aria-label="Page navigation example">
                                 <ul class="pagination justify-content-center">
                                 {% if page_index %}

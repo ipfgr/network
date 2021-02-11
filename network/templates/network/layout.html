@@ -23,38 +23,13 @@
 
 </head>
 <body onload=showAllPosts()>
+<div class="top-bar">
+
+    <div class="welcome"> Welcome to network, {{ request.user.username }}</div>
+
+</div>
 <div class="container">
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <a class="navbar-brand" href="#">Network</a>
-        <div>
-            <ul class="navbar-nav mr-auto ">
-                <li class="nav-item">
-                    <a class="nav-link " id="indexpage" href="{% url 'index' %}">All Posts</a>
-                </li>
-                    {% if user.is_authenticated %}
-                    <li class="nav-item">
-                        <a id="following-page" class="nav-link" href="{% url "followpage" %}">Following</a>
-                    </li>
-                    <div class="logbox end-0">
-                        <span class="navbar-text logged">
-                            Logged as: <strong><a
-                                href="/profile/{{ request.user.username }}">{{ request.user.username }} </a> </strong>
-                        </span>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'logout' %}">Log Out</a>
-                        </li>
-                    </div>
-                {% else %}
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'login' %}">Log In</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'register' %}">Register</a>
-                    </li>
-                {% endif %}
-            </ul>
-        </div>
-    </nav>
+
 
     <div class="body">
         {% block body %}
