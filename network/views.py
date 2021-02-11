@@ -4,10 +4,10 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.db import IntegrityError
+from django.db.models import Q
 from django.http import HttpResponseRedirect, JsonResponse
 from django.shortcuts import render
 from django.urls import reverse
-from django.db.models import Q
 
 from .models import Follow
 from .models import Like
@@ -19,7 +19,24 @@ def index(request):
     for_pagination = Post.objects.all().order_by("-id")
     posts = Paginator(for_pagination, 3)
     context = {
-        "pagination": posts
+        "pagination_all": posts,
+        "page_index": True,
+        "page_follow": False,
+    }
+    return render(request, "network/index.html", context)
+
+
+def follow(request):
+    follow_users = Follow.objects.filter(user_whofollow_id=request.user.username)
+    query = Q()
+    for username in follow_users:
+        query.add(Q(publish_user_id=username.user_tofollow_id), Q.OR)
+    for_pagination = Post.objects.filter(query)
+    posts = Paginator(for_pagination, 3)
+    context = {
+        "pagination_follow": posts,
+        "page_index": False,
+        "page_follow": True
     }
     return render(request, "network/index.html", context)
 
@@ -42,6 +59,9 @@ def follow_user_view(request):
         data = json.loads(request.body)
         who_follow = data.get("user", "")
         whom_follow = data.get("followto", "")
+        if who_follow == whom_follow:
+            return JsonResponse({"Error": "Cant follow yourself here"}, status=418)
+
         follow_check = Follow.objects.filter(user_whofollow_id=who_follow, user_tofollow_id=whom_follow)
         if not follow_check:
             follow_request = Follow(user_whofollow_id=who_follow, user_tofollow_id=whom_follow)
@@ -103,7 +123,6 @@ def posts_view(request, page=""):
 
     if request.method != "POST":
         for_pagination = Post.objects.all().order_by("-id")
-        print(for_pagination)
         page = request.GET.get("page")
         posts = Paginator(for_pagination, 3)
         page_obj = posts.get_page(page)

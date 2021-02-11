@@ -1,9 +1,16 @@
 document.addEventListener("DOMContentLoaded", () => {
 
     if (window.location.href.indexOf("profile") > -1) {
+        console.log("Profile page")
         const followButton = document.querySelector("#follow")
         followButton.addEventListener('click', () => startFollow())
     }
+    if (window.location.href.indexOf("followpage") > -1) {
+        console.log("Following page")
+
+    }
+
+
 
     const submitNewPost = document.getElementById("submit-post")
     const followPage = document.querySelector("#following-page")
@@ -14,13 +21,13 @@ document.addEventListener("DOMContentLoaded", () => {
     indexPageButton.addEventListener("click", () => showAllPosts())
     followPage.addEventListener("click", () => showAllFollowPosts())
 
+    //Form pagination
     page.forEach(el => {
         let number = el.innerHTML
         el.addEventListener('click', () => {
-            el.parentNode.classList.add("active")
             showAllPosts(number)
         })
-        console.log(number)
+
     })
 
     $('#edit-modal').on('show.bs.modal', function (e) {
@@ -40,7 +47,7 @@ function startFollow() {
     const user_id = JSON.parse(document.getElementById('currentuser').textContent)
     const profile_id = JSON.parse(document.getElementById('profile_id').textContent)
 
-    fetch(`/posts/follow`, {
+    fetch(`/api/posts/follow`, {
         method: "POST",
         headers: {
             "X-CSRFToken": getCookie("csrftoken")
@@ -50,11 +57,28 @@ function startFollow() {
             followto: profile_id.toLowerCase(),
         })
     })
-        .then(response => response.json())
-        .then(result => console.log(result))
+        .then(response => response.status)
+        .then(result => {
+            if (result == "418"){
+                document.querySelector(".toast").innerHTML = `<div class="toast-header">
+                                                                      <strong class="me-auto">Error</strong>
+                                                                      <small>now</small>
+                                                                      <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                                                                        </div>
+                                                                        <div class="toast-body">
+                                                                          Sorry, you cant follow yourself.
+                                                                        </div>
+                                                                      `
+               $('.toast').toast('show')
+                console.log("Error: Cant follow your account")
+            }
+            else {
+                console.log("Success!")
+            }
+        })
         .catch(err => console.log(err))
         .finally(() => {
-            location.reload()
+            setTimeout(()=>location.reload(), 2000)
         })
 }
 
@@ -62,7 +86,7 @@ function setLike(title, user) {
     const currentPage = JSON.parse(document.getElementById("current-page").textContent);
     console.log(currentPage)
     const full_posts = document.querySelector("#full-posts")
-    fetch(`posts/like`, {
+    fetch(`/api/posts/like`, {
         method: "POST",
         headers: {
             "X-CSRFToken": getCookie("csrftoken")
@@ -83,7 +107,7 @@ function setLike(title, user) {
 function submitEditPost() {
     const editedValue = document.querySelector("#message-text").value;
     const title = document.querySelector("#modalLabel").innerText
-    fetch(`/posts/edit`, {
+    fetch(`/api/posts/edit`, {
         method: "POST",
         headers: {
             "X-CSRFToken": getCookie("csrftoken")
@@ -101,7 +125,7 @@ function submitPost() {
     const full_posts = document.querySelector("#full-posts")
     const title = document.querySelector("#post-title").value
     const body = document.querySelector("#post-body").value
-    fetch('/posts', {
+    fetch('/api/posts', {
         method: "POST",
         headers: {
             "X-CSRFToken": getCookie("csrftoken")
@@ -136,10 +160,10 @@ function getCookie(name) {
 
 function showAllFollowPosts(number = 1) {
     const full_posts = document.querySelector("#full-posts")
-    const username = JSON.parse(document.getElementById('username').textContent)
     full_posts.innerHTML = ""
+    const username = JSON.parse(document.getElementById('username').textContent)
 
-    fetch(`/posts/follow?page=${number}`)
+    fetch(`/api/posts/follow?page=${number}`)
         .then(response => response.json())
         .then(result => {
             if (result.length > 0) {
@@ -169,10 +193,17 @@ function showAllFollowPosts(number = 1) {
 }
 
 function showAllPosts(number = 1) {
+    const page = document.querySelectorAll("#page")
+    page.forEach(page => page.parentNode.classList.remove("active"))
+    page.forEach(page => {
+        if (page.innerHTML == number){
+        page.parentNode.classList.add("active")
+    }
+    })
     const full_posts = document.querySelector("#full-posts")
     const username = JSON.parse(document.getElementById('username').textContent)
     full_posts.innerHTML = ""
-    fetch(`/posts?page=${number}`)
+    fetch(`/api/posts?page=${number}`)
         .then(response => response.json())
         .then(result => {
             if (result.length > 0) {
@@ -224,7 +255,7 @@ function showAllUserPosts(username) {
 
     loadmore.style.display = 'block';
     title.insertAdjacentHTML("beforeend", `All post's from user ${username}`)
-    fetch(`/posts/${username.toLowerCase()}`)
+    fetch(`/api/posts/${username.toLowerCase()}`)
         .then(response => response.json())
         .then(result => {
             if (result.length > 0) {

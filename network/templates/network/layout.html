@@ -29,7 +29,7 @@
                 </li>
                 {% if user.is_authenticated %}
                     <li class="nav-item">
-                        <a id="following-page" class="nav-link" href="#">Following</a>
+                        <a id="following-page" class="nav-link" href="{%  url "followpage" %}">Following</a>
                     </li>
                     <div class="logbox end-0">
                         <span class="navbar-text logged">
