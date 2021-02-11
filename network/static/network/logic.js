@@ -6,14 +6,15 @@ document.addEventListener("DOMContentLoaded", () => {
         followButton.addEventListener('click', () => startFollow())
     }
     if (window.location.href.indexOf("followpage") > -1) {
-         const pageFollow = document.querySelectorAll("#page-follow")
+        const pageFollow = document.querySelectorAll("#page-follow")
         pageFollow.forEach(el => {
-        let number = el.innerHTML
-        el.addEventListener('click', () => {
-            showAllFollowPosts(number)
+            let number = el.innerHTML
+            el.addEventListener('click', () => {
+                showAllFollowPosts(number)
+            })
         })
+        showAllFollowPosts(1)
 
-    })
     }
 
 
@@ -178,7 +179,7 @@ function showAllFollowPosts(number = 1) {
         .then(result => {
             if (result.length > 0) {
                 for (let i = 0; i < result.length; i++) {
-                        let row = `
+                    let row = `
                                     <div class="one-post">
                                     <div class="out-post-container">
                                     <div class="post-title">${result[i].title}</div>
@@ -189,7 +190,7 @@ function showAllFollowPosts(number = 1) {
                                     </div>
                                     </div>
                                     `
-                        follow_posts.innerHTML += row
+                    follow_posts.innerHTML += row
 
                 }
             } else {
@@ -199,7 +200,45 @@ function showAllFollowPosts(number = 1) {
                 follow_posts.innerHTML = row;
             }
         }).catch(error => console.error(error))
-    
+
+    // const pageFollow = document.querySelectorAll("#page-follow")
+    // pageFollow.forEach(page => page.parentNode.classList.remove("active"))
+    // pageFollow.forEach(page => {
+    //     if (page.innerHTML == number) {
+    //         page.parentNode.classList.add("active")
+    //     }
+    // })
+    // const follow_posts = document.querySelector("#follow-posts")
+    // const username = JSON.parse(document.getElementById('username').textContent)
+    // follow_posts.innerHTML = ""
+    // fetch(`/api/posts/follow?page=${number}`)
+    //     .then(response => response.json())
+    //     .then(answer => {
+    //         if (answer.length > 0) {
+    //             for (let i = 0; i < answer.length; i++) {
+    //                 if (answer[i].publish_user == username) {
+    //                     let row = `
+    //                                 <div class="one-post">
+    //                                 <div class="out-post-container">
+    //                                 <div class="post-title">${answer[i].title}</div>
+    //                                 <div class="post-timestamp">${answer[i].timestamp}</div>
+    //                                 <div class="post-body">${answer[i].body}</div>
+    //                                 <div class="post-publish_user"><a href="/profile/${answer[i].publish_user}">Posted by: ${answer[i].publish_user}</a></div>
+    //                                 <div class="likes"><button id="submit-like" onClick = "setLike('${answer[i].title}' , '${username}')" class="btn btn-danger like-button" >${answer[i].likes}</button> like's</div>
+    //                                 </div>
+    //                                 </div>
+    //                                 `
+    //                     follow_posts.innerHTML += row
+    //                 }
+    //             }
+    //         } else {
+    //             let row = `
+    //                         <h5>Not yet follow anyone</h5>
+    //                       `
+    //             follow_posts.innerHTML = row;
+    //         }
+    //     }).catch(error => console.error(error))
+}
 
 function showAllPosts(number = 1) {
     const pageAll = document.querySelectorAll("#page-all")

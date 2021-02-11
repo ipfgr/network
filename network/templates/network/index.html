@@ -40,7 +40,6 @@
             </div>
             <br/>
 
-
             <div id="all-posts" class="all-posts">
                 <div class="posts-for-profile">
                     <div class="container">
@@ -48,10 +47,8 @@
                             <h1>All post's</h1>
                             <nav aria-label="Page navigation example">
                                 <ul class="pagination justify-content-center">
-
                                 {% if page_index %}
                                     {% for page in pagination_all.page_range %}
-
                                         <li class="page-item"><a id="page-all" class="page-link"
                                                                   href="#">{{ page }}</a></li>
                                     {% endfor %}
@@ -61,7 +58,6 @@
                                                                   href="#">{{ page }}</a></li>
                                     {% endfor %}
                                 {% endif %}
-
                                 </ul>
                             </nav>
                             {% if page_index %}

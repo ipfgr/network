@@ -49,7 +49,7 @@ def follow_user_view(request):
         query = Q()
         for username in follow_users:
             query.add(Q(publish_user_id=username.user_tofollow_id), Q.OR)
-        for_pagination = Post.objects.filter(query)
+        for_pagination = Post.objects.filter(query).order_by("-id")
         posts = Paginator(for_pagination, 3)
         page_obj = posts.get_page(page)
 
