@@ -52,12 +52,12 @@
                                 {% if page_index %}
                                     {% for page in pagination_all.page_range %}
 
-                                        <li class="page-item"><a id="page" class="page-link"
+                                        <li class="page-item"><a id="page-all" class="page-link"
                                                                   href="#">{{ page }}</a></li>
                                     {% endfor %}
                                 {%  else %}
                                         {% for page in pagination_follow.page_range %}
-                                        <li class="page-item"><a id="page" class="page-link"
+                                        <li class="page-item"><a id="page-follow" class="page-link"
                                                                   href="#">{{ page }}</a></li>
                                     {% endfor %}
                                 {% endif %}

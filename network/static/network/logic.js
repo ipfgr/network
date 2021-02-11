@@ -6,23 +6,28 @@ document.addEventListener("DOMContentLoaded", () => {
         followButton.addEventListener('click', () => startFollow())
     }
     if (window.location.href.indexOf("followpage") > -1) {
-        console.log("Following page")
+         const pageFollow = document.querySelectorAll("#page-follow")
+        pageFollow.forEach(el => {
+        let number = el.innerHTML
+        el.addEventListener('click', () => {
+            showAllFollowPosts(number)
+        })
 
+    })
     }
-
 
 
     const submitNewPost = document.getElementById("submit-post")
     const followPage = document.querySelector("#following-page")
     const indexPageButton = document.querySelector("#indexpage")
-    const page = document.querySelectorAll("#page")
+    const pageAll = document.querySelectorAll("#page-all")
 
     submitNewPost.addEventListener("click", () => submitPost())
     indexPageButton.addEventListener("click", () => showAllPosts())
     followPage.addEventListener("click", () => showAllFollowPosts())
 
     //Form pagination
-    page.forEach(el => {
+    pageAll.forEach(el => {
         let number = el.innerHTML
         el.addEventListener('click', () => {
             showAllPosts(number)
@@ -59,7 +64,7 @@ function startFollow() {
     })
         .then(response => response.status)
         .then(result => {
-            if (result == "418"){
+            if (result == "418") {
                 document.querySelector(".toast").innerHTML = `<div class="toast-header">
                                                                       <strong class="me-auto">Error</strong>
                                                                       <small>now</small>
@@ -69,16 +74,15 @@ function startFollow() {
                                                                           Sorry, you cant follow yourself.
                                                                         </div>
                                                                       `
-               $('.toast').toast('show')
+                $('.toast').toast('show')
                 console.log("Error: Cant follow your account")
-            }
-            else {
+            } else {
                 console.log("Success!")
             }
         })
         .catch(err => console.log(err))
         .finally(() => {
-            setTimeout(()=>location.reload(), 2000)
+            setTimeout(() => location.reload(), 2000)
         })
 }
 
@@ -118,7 +122,6 @@ function submitEditPost() {
         })
     })
     $('#edit-modal').modal('hide')
-    location.reload()
 }
 
 function submitPost() {
@@ -159,16 +162,22 @@ function getCookie(name) {
 }
 
 function showAllFollowPosts(number = 1) {
-    const full_posts = document.querySelector("#full-posts")
-    full_posts.innerHTML = ""
-    const username = JSON.parse(document.getElementById('username').textContent)
 
+    const pageFollow = document.querySelectorAll("#page-follow")
+    pageFollow.forEach(page => page.parentNode.classList.remove("active"))
+    pageFollow.forEach(page => {
+        if (page.innerHTML == number) {
+            page.parentNode.classList.add("active")
+        }
+    })
+    const follow_posts = document.querySelector("#following-posts")
+    const username = JSON.parse(document.getElementById('username').textContent)
+    follow_posts.innerHTML = ""
     fetch(`/api/posts/follow?page=${number}`)
         .then(response => response.json())
         .then(result => {
             if (result.length > 0) {
                 for (let i = 0; i < result.length; i++) {
-                    if (result[i].publish_user == username) {
                         let row = `
                                     <div class="one-post">
                                     <div class="out-post-container">
@@ -180,25 +189,25 @@ function showAllFollowPosts(number = 1) {
                                     </div>
                                     </div>
                                     `
-                        full_posts.innerHTML += row
-                    }
+                        follow_posts.innerHTML += row
+
                 }
             } else {
                 let row = `
-                            <h5>Not yet follow anyone</h5>
-                          `
-                full_posts.innerHTML = row;
+                                       <h5>Not yet have posts</h5>
+                                      `
+                follow_posts.innerHTML = row;
             }
         }).catch(error => console.error(error))
-}
+    
 
 function showAllPosts(number = 1) {
-    const page = document.querySelectorAll("#page")
-    page.forEach(page => page.parentNode.classList.remove("active"))
-    page.forEach(page => {
-        if (page.innerHTML == number){
-        page.parentNode.classList.add("active")
-    }
+    const pageAll = document.querySelectorAll("#page-all")
+    pageAll.forEach(page => page.parentNode.classList.remove("active"))
+    pageAll.forEach(page => {
+        if (page.innerHTML == number) {
+            page.parentNode.classList.add("active")
+        }
     })
     const full_posts = document.querySelector("#full-posts")
     const username = JSON.parse(document.getElementById('username').textContent)
