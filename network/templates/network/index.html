@@ -58,10 +58,10 @@
                                 <form class="form" method="post">
                                     {% csrf_token %}
                                     <input id="post-title" class="form-control" type="text" name="title"
-                                           placeholder="Post title" required>
+                                           placeholder="Post title" required >
                                     <br/>
                                     <textarea id="post-body" class="form-control" type="text" , name="post"
-                                              maxlength="500" placeholder="Write your post here"></textarea>
+                                              maxlength="500" placeholder="Write your post here" required ></textarea>
                                     <br/>
                                 </form>
                             </div>
@@ -69,6 +69,9 @@
                         <button id="submit-post" type="button" class="btn btn-primary newpost-button" type="submit">
                             Submit Post
                         </button>
+                        <div id="error-message">
+
+                        </div>
             </div>
             <br/>
         {% endif %}

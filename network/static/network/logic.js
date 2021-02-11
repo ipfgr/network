@@ -123,13 +123,16 @@ function submitEditPost() {
         })
     })
     $('#edit-modal').modal('hide')
+    location.reload();
 }
 
 function submitPost() {
     const full_posts = document.querySelector("#full-posts")
+    const errorMessage = document.querySelector("#error-message")
     const title = document.querySelector("#post-title").value
     const body = document.querySelector("#post-body").value
-    fetch('/api/posts', {
+    if (body && title){
+        fetch('/api/posts', {
         method: "POST",
         headers: {
             "X-CSRFToken": getCookie("csrftoken")
@@ -142,8 +145,22 @@ function submitPost() {
         .then(response => console.log(response))
         .finally(() => {
             full_posts.innerHTML = ""
+            body.innerHTML = ""
+            title.innerHTML = ""
             showAllPosts()
         })
+    }
+    else {
+        errorMessage.innerHTML = `
+        <div id="error-message" class="alert alert-info">
+                            <h3>Error, need add title and post body for submit</h3>
+                        </div>`
+        setTimeout(()=> {
+            errorMessage.innerHTML = ""
+        },2000)
+    }
+
+
 }
 
 function getCookie(name) {

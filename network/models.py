@@ -34,7 +34,7 @@ class Post(models.Model):
         }
 
 class Like(models.Model):
-    like_topost = models.ForeignKey(Post, to_field="title", on_delete=models.PROTECT)
+    like_topost = models.ForeignKey(Post, to_field="title", on_delete=models.CASCADE)
     like_by = models.CharField(max_length=200, default="none")
 
     def __str__(self):
